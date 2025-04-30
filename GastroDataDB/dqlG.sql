@@ -46,3 +46,37 @@ GROUP BY c.Nombre, c.Apellido;
 SELECT DISTINCT m.id_mesa, m.Ubicacion, m.num_Comensales
 FROM Mesa m
 JOIN Factura f ON m.id_mesa = f.id_mesa;
+
+--Crear Views
+
+CREATE VIEW VistaConsumoCliente AS
+SELECT 
+    c.Nombre AS NombreCliente,
+    b.Nombre AS Bebida,
+    p.Nombre AS Platillo,
+    f.Fecha_factura,
+    b.Importe AS ImporteBebida,
+    p.Importe AS ImportePlatillo
+FROM Factura f
+JOIN Cliente c ON f.id_cliente = c.id_cliente
+JOIN Bebida b ON f.id_bebida = b.id_bebida
+JOIN Platillo p ON f.id_platillo = p.id_platillo;
+
+CREATE VIEW VistaMeseroFacturas AS
+SELECT 
+    m.Nombre AS NombreMesero,
+    m.Apellido1,m.Apellido2,f.id_factura,f.Fecha_factura,
+    me.id_mesa
+FROM Factura f
+JOIN Mesero m ON f.id_mesero = m.id_mesero
+JOIN Mesa me ON f.id_mesa = me.id_mesa;
+
+CREATE VIEW VistaTotalCompraCliente AS
+SELECT 
+    c.Nombre AS NombreCliente, c.Apellido,
+    SUM(p.Importe + b.Importe) AS TotalGastado
+FROM Factura f
+JOIN Cliente c ON f.id_cliente = c.id_cliente
+JOIN Platillo p ON f.id_platillo = p.id_platillo
+JOIN Bebida b ON f.id_bebida = b.id_bebida
+GROUP BY c.id_cliente, c.Nombre, c.Apellido;
