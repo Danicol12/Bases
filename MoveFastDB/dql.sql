@@ -40,3 +40,51 @@ WHERE matricula IN (
 -- 5. Total de pagos recibidos
 SELECT SUM(monto) AS total_pagado
 FROM pago;
+
+-- 6 Total de ingresos por sucursal (solo vehículos alquilados más de 3 veces)
+SELECT s.localidad, SUM(p.monto) AS ingresos_totales
+FROM pago p
+JOIN alquiler a ON p.id_renta_ref = a.id_alquiler
+JOIN vehiculo v ON v.matricula = a.placa_auto
+JOIN sucursal s ON v.id_sucursal = s.id_sucursal
+WHERE v.matricula IN (
+    SELECT placa_auto
+    FROM alquiler
+    GROUP BY placa_auto
+    HAVING COUNT(*) > 3
+)
+GROUP BY s.localidad;
+
+-- 7 Vehículos con más de 5 alquileres
+SELECT *
+FROM vehiculo
+WHERE matricula IN (
+    SELECT placa_auto
+    FROM alquiler
+    GROUP BY placa_auto
+    HAVING COUNT(*) > 5
+);
+
+-- 8 Total de pagos recibidos
+SELECT SUM(monto) AS total_pagado
+FROM pago;
+
+
+-- Pruebas de borrado o error
+
+--Borra un cliente
+DELETE FROM cliente WHERE documento="1012345670"
+SELECT * FROM alquiler;
+
+
+--Actualiza el id
+
+SELECT * FROM sucursal WHERE id_sucursal = 1;
+UPDATE sucursal SET id_sucursal = 10 WHERE id_sucursal = 1;
+SELECT * FROM vehiculo WHERE id_sucursal = 10;
+
+--Insertar valores incorrectos
+INSERT INTO vehiculo (fabricante, matricula, id_sucursal, anio, color)
+VALUES ('TestCar', 'ZZZ999', 2, 1999, 'Negro');
+
+
